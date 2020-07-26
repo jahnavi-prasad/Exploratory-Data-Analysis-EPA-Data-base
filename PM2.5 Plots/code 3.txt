@@ -1,0 +1,33 @@
+library(ggplot2)
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+
+baltimore <- NEI[NEI$fips == "24510", ]
+types <- unique(baltimore$type)
+df <- data.frame(year = as.numeric(),
+                 total_em = as.numeric(),
+                 type = as.character())
+years <- seq(1999, 2008, length.out = 4)
+for (t in types) {
+    sub_df <- baltimore[baltimore$type == t, ]
+    for (y in years) {
+        row <- vector()
+        Em <- sub_df[sub_df$year == y, ]
+        total_emission <- sum(Em$Emissions)
+        row <- c(t, y, total_emission)
+        df <- rbind(df, row)
+    }
+}
+colnames(df) <- c("Type", "Year", "Total_emission")
+
+png("plot3.png", width = 600, height = 480)
+g <- ggplot(data = df, aes(Year, Total_emission, color = Type)) +
+    labs(title = "YoY Emission in Baltimore based on type")
+g + geom_line(aes(group = Type), size = 1) + 
+    theme(axis.text.y = element_blank(), 
+          plot.title = element_text(family = "Helvetica",
+                                    face = "bold", size = (20)),
+          axis.title = element_text(family = "Helvetica",
+                                    face = "bold", size = (15)),
+          legend.position = "bottom")
+dev.off()

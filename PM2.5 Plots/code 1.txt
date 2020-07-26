@@ -1,0 +1,14 @@
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+
+total_emission <- vector()
+years <- seq(1999, 2008, length.out = 4)
+for (y in years) {
+    Em <- NEI[NEI$year == y, ]
+    total_emission <- append(total_emission, sum(Em$Emissions))
+}
+
+png("plot1.png", width = 480, height = 480)
+plot(years, total_emission, col = "#AA4371", cex = 1.5, type = "l", lwd = 2,
+     main = "Total Emission from PM2.5 YoY")
+dev.off()
